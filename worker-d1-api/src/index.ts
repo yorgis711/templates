@@ -5,6 +5,12 @@ interface Comment {
 	author: string;
 	body: string;
 }
+
+function sanitize(str: string): string {
+  str = str.replace(/[^a-z0-9áéíóúñü \.,_-]/gim,"");
+  return str.trim();
+}
+
 const app = new Hono();
 app.use('/api/*', cors());
 
@@ -32,7 +38,7 @@ app.post('/api/posts/:slug/comments', async c => {
     insert into comments (author, body, post_slug) values (?, ?, ?)
   `
 	)
-		.bind(author, body, slug)
+		.bind(sanitize(author), sanitize(body), slug)
 		.run();
 
 	if (success) {
